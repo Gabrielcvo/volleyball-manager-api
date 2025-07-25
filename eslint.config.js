@@ -11,7 +11,6 @@ export default [
   {
     rules: {
       semi: "off",
-      quotes: ["error", "single"],
     },
   },
 ];
