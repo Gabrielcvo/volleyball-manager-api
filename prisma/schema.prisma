@@ -136,6 +136,7 @@ model jogador {
   usuario                                                   usuario                @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   jogador_time                                              jogador_time[]
   membro_grupo                                              membro_grupo[]
+  evento_jogo                                               evento_jogo[]
 }
 
 model jogador_time {
@@ -206,18 +207,62 @@ model partida {
   notificacao              notificacao[]
   grupo                    grupo                  @relation(fields: [grupo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   time                     time[]
+  jogo                     jogo[]
 
   @@index([grupo_id], map: "idx_partida_grupo")
 }
 
+model jogo {
+  id               Int              @id @default(autoincrement())
+  partida_id       Int
+  numero_jogo      Int              // 1, 2, 3... ordem sequencial dos jogos
+  time_a_id        Int
+  time_b_id        Int
+  placar_time_a    Int?             @default(0)
+  placar_time_b    Int?             @default(0)
+  time_vencedor_id Int?
+  status_jogo      status_jogo?     @default(agendado)
+  duracao_minutos  Int?
+  data_inicio      DateTime?        @db.Timestamptz(6)
+  data_fim         DateTime?        @db.Timestamptz(6)
+  observacoes      String?
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  partida          partida          @relation(fields: [partida_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  time_a           time             @relation("jogo_time_a", fields: [time_a_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  time_b           time             @relation("jogo_time_b", fields: [time_b_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  time_vencedor    time?            @relation("jogo_vencedor", fields: [time_vencedor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  evento_jogo      evento_jogo[]
+
+  @@unique([partida_id, numero_jogo])
+  @@index([partida_id], map: "idx_jogo_partida")
+}
+
+model evento_jogo {
+  id             Int         @id @default(autoincrement())
+  jogo_id        Int
+  jogador_id     Int
+  time_id        Int
+  tipo_evento    tipo_evento
+  minuto_jogo    Int?
+  descricao      String?
+  data_evento    DateTime    @default(now()) @db.Timestamptz(6)
+  jogo           jogo        @relation(fields: [jogo_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  jogador        jogador     @relation(fields: [jogador_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  time           time        @relation(fields: [time_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
 model time {
-  id              Int              @id @default(autoincrement())
-  partida_id      Int
-  nome_time       String?          @db.VarChar(255)
-  pontuacao_final Int?             @default(0)
-  evento_partida  evento_partida[]
-  jogador_time    jogador_time[]
-  partida         partida          @relation(fields: [partida_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                            Int              @id @default(autoincrement())
+  partida_id                    Int
+  nome_time                     String?          @db.VarChar(255)
+  pontuacao_final               Int?             @default(0)
+  evento_partida                evento_partida[]
+  jogador_time                  jogador_time[]
+  partida                       partida          @relation(fields: [partida_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  jogo_time_a                   jogo[]           @relation("jogo_time_a")
+  jogo_time_b                   jogo[]           @relation("jogo_time_b")
+  jogo_vencedor                 jogo[]           @relation("jogo_vencedor")
+  evento_jogo                   evento_jogo[]
 }
 
 model transacao_financeira {
@@ -319,4 +364,11 @@ enum tipo_vantagem {
   vetar_nota
   clube_descontos
   experiencias_exclusivas
+}
+
+enum status_jogo {
+  agendado
+  em_andamento
+  finalizado
+  cancelado
 }
