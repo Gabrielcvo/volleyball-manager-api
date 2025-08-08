@@ -12,6 +12,7 @@ import grupoRoutes from "./routes/grupoRoutes";
 import partidaRoutes from "./routes/partidaRoutes";
 import rankingRoutes from "./routes/rankingRoutes";
 import timeRoutes from "./routes/timeRoutes";
+import jogoRoutes from "./routes/jogoRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,7 @@ app.get("/", (req: Request, res: Response) => {
       ranking: "/grupos/:id/ranking",
       historico: "/grupos/:id/historico",
       times: "/partidas/:id/times",
+      jogos: "/partidas/:id/jogos",
     },
   });
 });
@@ -43,6 +45,7 @@ app.use("/grupos", grupoRoutes); // Grupos
 app.use("/", partidaRoutes); // Partidas (inclui rotas com grupos e partidas)
 app.use("/", rankingRoutes); // Ranking e histórico
 app.use("/", timeRoutes); // Times
+app.use("/", jogoRoutes); // Jogos sequenciais
 
 // Middleware para rotas não encontradas
 app.use((req: Request, res: Response) => {
@@ -106,4 +109,17 @@ app.listen(PORT, () => {
   console.log("  - GET /partidas/:id/times - Listar times da partida");
   console.log("  - PUT /times/:id - Editar time");
   console.log("  - PUT /times/:id/pontuacao - Atualizar pontuação");
+  console.log("");
+  console.log("🎮 Jogos Sequenciais:");
+  console.log(
+    "  - POST /partidas/:id/jogos/inicializar - Inicializar sistema de jogos"
+  );
+  console.log("  - GET /partidas/:id/jogos - Listar jogos da partida");
+  console.log("  - POST /partidas/:id/jogos - Criar próximo jogo");
+  console.log("  - GET /jogos/:id - Obter detalhes do jogo");
+  console.log("  - PUT /jogos/:id/iniciar - Iniciar jogo");
+  console.log(
+    "  - PUT /jogos/:id/atualizar-pontos - Atualizar pontos em tempo real"
+  );
+  console.log("  - PUT /jogos/:id/finalizar - Finalizar jogo");
 });
