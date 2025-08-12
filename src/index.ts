@@ -17,8 +17,52 @@ import jogoRoutes from "./routes/jogoRoutes";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configuração de CORS para produção
+const corsOptions = {
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) {
+    // Lista de origins permitidos
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:5173",
+      "https://localhost:3000",
+      process.env.FRONTEND_URL,
+      process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+    ].filter(Boolean);
+
+    // Para desenvolvimento, permite requests sem origin (ex: mobile apps, Postman)
+    if (!origin && process.env.NODE_ENV !== "production") {
+      return callback(null, true);
+    }
+
+    // Verifica se o origin está na lista de permitidos
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Bloqueado pelo CORS: Origin não permitido"), false);
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+  allowedHeaders: [
+    "Origin",
+    "X-Requested-With",
+    "Content-Type",
+    "Accept",
+    "Authorization",
+    "Cache-Control",
+    "Pragma",
+  ],
+  exposedHeaders: ["Authorization"],
+  maxAge: 86400, // Cache preflight por 24 horas
+};
+
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // Rota de saúde (pública)
