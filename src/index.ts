@@ -63,6 +63,43 @@ const corsOptions = {
 // Middlewares
 app.use(cors(corsOptions));
 
+// Middleware adicional para garantir headers CORS em todas as responses
+app.use((req: Request, res: Response, next) => {
+  // Define headers CORS manualmente como fallback
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:5173",
+    "https://localhost:3000",
+    process.env.FRONTEND_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined,
+  ].filter(Boolean);
+
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin || "*");
+  }
+
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control, Pragma"
+  );
+  res.header("Access-Control-Expose-Headers", "Authorization");
+  res.header("Access-Control-Max-Age", "86400");
+
+  // Responde às requisições OPTIONS (preflight)
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  next();
+});
+
 app.use(express.json());
 
 // Rota de saúde (pública)
