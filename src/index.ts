@@ -13,6 +13,7 @@ import partidaRoutes from "./routes/partidaRoutes";
 import rankingRoutes from "./routes/rankingRoutes";
 import timeRoutes from "./routes/timeRoutes";
 import jogoRoutes from "./routes/jogoRoutes";
+import jogoPeladaRoutes from "./routes/jogoPeladaRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,7 +46,8 @@ app.use("/grupos", grupoRoutes); // Grupos
 app.use("/", partidaRoutes); // Partidas (inclui rotas com grupos e partidas)
 app.use("/", rankingRoutes); // Ranking e histórico
 app.use("/", timeRoutes); // Times
-app.use("/", jogoRoutes); // Jogos sequenciais
+app.use("/", jogoRoutes); // Jogos sequenciais (sistema antigo)
+app.use("/", jogoPeladaRoutes); // Jogos de pelada (sistema novo simplificado)
 
 // Middleware para rotas não encontradas
 app.use((req: Request, res: Response) => {
@@ -110,7 +112,7 @@ app.listen(PORT, () => {
   console.log("  - PUT /times/:id - Editar time");
   console.log("  - PUT /times/:id/pontuacao - Atualizar pontuação");
   console.log("");
-  console.log("🎮 Jogos Sequenciais:");
+  console.log("🎮 Jogos Sequenciais (Sistema Antigo):");
   console.log(
     "  - POST /partidas/:id/jogos/inicializar - Inicializar sistema de jogos"
   );
@@ -121,5 +123,15 @@ app.listen(PORT, () => {
   console.log(
     "  - PUT /jogos/:id/atualizar-pontos - Atualizar pontos em tempo real"
   );
+  console.log("  - PUT /jogos/:id/finalizar - Finalizar jogo");
+  console.log("");
+  console.log("🏐 Peladas Sequenciais (Sistema Novo):");
+  console.log("  - POST /partidas/:id/pelada/iniciar - Iniciar pelada");
+  console.log("  - PUT /partidas/:id/pelada/finalizar - Finalizar pelada");
+  console.log("  - POST /partidas/:id/jogos - Criar novo jogo");
+  console.log("  - GET /partidas/:id/jogos - Histórico e estatísticas");
+  console.log("  - GET /jogos/:id - Detalhes do jogo");
+  console.log("  - PUT /jogos/:id/iniciar - Iniciar jogo");
+  console.log("  - PUT /jogos/:id/pontos - Atualizar pontos");
   console.log("  - PUT /jogos/:id/finalizar - Finalizar jogo");
 });
