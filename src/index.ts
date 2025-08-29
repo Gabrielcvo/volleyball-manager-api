@@ -19,24 +19,30 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
-app.use(cors());
 app.use(express.json());
+app.use(
+  cors({
+    origin: true, // Permite qualquer origem em desenvolvimento/produção
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+      "Access-Control-Allow-Credentials",
+    ],
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
+  })
+);
 
-// Rota de saúde (pública)
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     status: "API rodando com sucesso!",
     message: "Volleyball Manager API",
     version: "1.0.0",
-    endpoints: {
-      auth: "/auth",
-      grupos: "/grupos",
-      partidas: "/partidas (ou /grupos/:id/partidas)",
-      ranking: "/grupos/:id/ranking",
-      historico: "/grupos/:id/historico",
-      times: "/partidas/:id/times",
-      jogos: "/partidas/:id/jogos",
-    },
   });
 });
 
@@ -76,62 +82,4 @@ app.use((error: unknown, req: Request, res: Response) => {
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
-  console.log(`API disponível em http://localhost:${PORT}/`);
-  console.log("Endpoints disponíveis:");
-  console.log("🔐 Autenticação:");
-  console.log("  - POST /auth/register - Cadastro de usuário");
-  console.log("  - POST /auth/login - Login de usuário");
-  console.log("  - GET /auth/profile - Perfil do usuário");
-  console.log("");
-  console.log("👥 Grupos:");
-  console.log("  - POST /grupos - Criar grupo");
-  console.log("  - GET /grupos - Listar grupos do usuário");
-  console.log("  - GET /grupos/:id - Obter detalhes do grupo");
-  console.log("  - POST /grupos/:id/membros - Adicionar jogador ao grupo");
-  console.log("  - GET /grupos/:id/membros - Listar membros do grupo");
-  console.log("  - DELETE /grupos/:id/membros/:jogadorId - Remover jogador");
-  console.log("");
-  console.log("🏐 Partidas:");
-  console.log("  - POST /grupos/:id/partidas - Criar partida");
-  console.log("  - GET /grupos/:id/partidas - Listar partidas do grupo");
-  console.log("  - GET /partidas/:id - Obter detalhes da partida");
-  console.log("  - PUT /partidas/:id - Atualizar partida");
-  console.log("  - POST /partidas/:id/confirmar - Confirmar presença");
-  console.log("  - GET /partidas/:id/confirmacoes - Listar confirmações");
-  console.log("");
-  console.log("🏆 Ranking e Estatísticas:");
-  console.log("  - GET /grupos/:id/ranking - Ranking do grupo");
-  console.log("  - GET /grupos/:id/historico - Histórico de partidas");
-  console.log(
-    "  - GET /grupos/:id/jogadores/:jogadorId/estatisticas - Estatísticas do jogador"
-  );
-  console.log("");
-  console.log("⚽ Times:");
-  console.log("  - POST /partidas/:id/sortear-times - Sortear times");
-  console.log("  - GET /partidas/:id/times - Listar times da partida");
-  console.log("  - PUT /times/:id - Editar time");
-  console.log("  - PUT /times/:id/pontuacao - Atualizar pontuação");
-  console.log("");
-  console.log("🎮 Jogos Sequenciais (Sistema Antigo):");
-  console.log(
-    "  - POST /partidas/:id/jogos/inicializar - Inicializar sistema de jogos"
-  );
-  console.log("  - GET /partidas/:id/jogos - Listar jogos da partida");
-  console.log("  - POST /partidas/:id/jogos - Criar próximo jogo");
-  console.log("  - GET /jogos/:id - Obter detalhes do jogo");
-  console.log("  - PUT /jogos/:id/iniciar - Iniciar jogo");
-  console.log(
-    "  - PUT /jogos/:id/atualizar-pontos - Atualizar pontos em tempo real"
-  );
-  console.log("  - PUT /jogos/:id/finalizar - Finalizar jogo");
-  console.log("");
-  console.log("🏐 Peladas Sequenciais (Sistema Novo):");
-  console.log("  - POST /partidas/:id/pelada/iniciar - Iniciar pelada");
-  console.log("  - PUT /partidas/:id/pelada/finalizar - Finalizar pelada");
-  console.log("  - POST /partidas/:id/jogos - Criar novo jogo");
-  console.log("  - GET /partidas/:id/jogos - Histórico e estatísticas");
-  console.log("  - GET /jogos/:id - Detalhes do jogo");
-  console.log("  - PUT /jogos/:id/iniciar - Iniciar jogo");
-  console.log("  - PUT /jogos/:id/pontos - Atualizar pontos");
-  console.log("  - PUT /jogos/:id/finalizar - Finalizar jogo");
 });
