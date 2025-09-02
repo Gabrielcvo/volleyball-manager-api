@@ -20,10 +20,12 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(express.json());
+
+// Configuração CORS para compatibilidade móvel
 app.use(
   cors({
-    origin: true, // Permite qualquer origem em desenvolvimento/produção
-    credentials: true,
+    origin: "*", // Permite qualquer origem
+    credentials: false, // Desabilita credentials para compatibilidade móvel
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: [
       "Origin",
@@ -32,11 +34,29 @@ app.use(
       "Accept",
       "Authorization",
       "Access-Control-Allow-Credentials",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Methods",
+      "Access-Control-Allow-Headers",
     ],
     preflightContinue: false,
     optionsSuccessStatus: 200,
+    maxAge: 86400, // Cache preflight por 24 horas
   })
 );
+
+// Headers CORS adicionais para garantir compatibilidade
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+//   res.header("Access-Control-Max-Age", "86400");
+
+//   if (req.method === "OPTIONS") {
+//     res.sendStatus(200);
+//   } else {
+//     next();
+//   }
+// });
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
