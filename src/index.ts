@@ -33,7 +33,7 @@ app.use(
       "Content-Type",
       "Accept",
       "Authorization",
-      "Access-Control-Allow-Credentials",
+      // "Access-Control-Allow-Credentials",
       "Access-Control-Allow-Origin",
       "Access-Control-Allow-Methods",
       "Access-Control-Allow-Headers",
@@ -45,18 +45,24 @@ app.use(
 );
 
 // Headers CORS adicionais para garantir compatibilidade
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-//   res.header("Access-Control-Max-Age", "86400");
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.header("Access-Control-Max-Age", "86400");
 
-//   if (req.method === "OPTIONS") {
-//     res.sendStatus(200);
-//   } else {
-//     next();
-//   }
-// });
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
