@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(express.json());
 
-// Configuração CORS para compatibilidade móvel
+// Configuração CORS para compatibilidade
 app.use(
   cors({
     origin: "*", // Permite qualquer origem
