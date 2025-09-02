@@ -13,9 +13,9 @@ const router = Router();
 router.use(authenticateToken);
 
 // Rotas para times
-router.post("/partidas/:partidaId/sortear-times", sortearTimes); // POST /partidas/:partidaId/sortear-times - Sortear times
-router.get("/partidas/:partidaId/times", listarTimes); // GET /partidas/:partidaId/times - Listar times da partida
-router.put("/times/:timeId", editarTime); // PUT /times/:timeId - Editar time
-router.put("/times/:timeId/pontuacao", atualizarPontuacao); // PUT /times/:timeId/pontuacao - Atualizar pontuação
+router.post("/partidas/:partidaId/sortear-times", sortearTimes); // POST /times/partidas/:partidaId/sortear-times - Sortear times
+router.get("/partidas/:partidaId/times", listarTimes); // GET /times/partidas/:partidaId/times - Listar times da partida
+router.put("/:timeId", editarTime); // PUT /times/:timeId - Editar time
+router.put("/:timeId/pontuacao", atualizarPontuacao); // PUT /times/:timeId/pontuacao - Atualizar pontuação
 
 export default router;

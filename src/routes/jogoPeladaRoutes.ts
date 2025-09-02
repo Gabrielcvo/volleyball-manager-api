@@ -33,16 +33,15 @@ router.get("/partidas/:partidaId/jogos", listarJogos);
 // === CONTROLE DE JOGOS INDIVIDUAIS ===
 
 // Obter detalhes de um jogo específico
-router.get("/jogos/:jogoId", obterJogo);
+router.get("/:jogoId", obterJogo);
 
 // Iniciar jogo específico
-router.put("/jogos/:jogoId/iniciar", iniciarJogo);
+router.put("/:jogoId/iniciar", iniciarJogo);
 
 // Atualizar pontuação em tempo real
-router.put("/jogos/:jogoId/pontos", atualizarPontos);
+router.put("/:jogoId/pontos", atualizarPontos);
 
 // Finalizar jogo e registrar resultado
-router.put("/jogos/:jogoId/finalizar", finalizarJogo);
+router.put("/:jogoId/finalizar", finalizarJogo);
 
 export default router;
-

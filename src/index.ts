@@ -18,30 +18,25 @@ import jogoPeladaRoutes from "./routes/jogoPeladaRoutes";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const allowedOrigins = [
-  "https://volleyball-manager-api-git-feat-cors-gabrielcvos-projects.vercel.app/",
-];
 // Middlewares
-const corsOptions = {
-  origin: function (
-    origin: string | undefined,
-    callback: (err: Error | null, allow?: boolean) => void
-  ) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
-    if (!origin) return callback(null, true);
+app.use(
+  cors({
+    origin: true, // Permite qualquer origem em desenvolvimento/produção
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+      "Access-Control-Allow-Credentials",
+    ],
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
+  })
+);
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-
-app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
@@ -55,11 +50,11 @@ app.get("/", (req: Request, res: Response) => {
 // Rotas da aplicação
 app.use("/auth", authRoutes); // Autenticação
 app.use("/grupos", grupoRoutes); // Grupos
-app.use("/", partidaRoutes); // Partidas (inclui rotas com grupos e partidas)
-app.use("/", rankingRoutes); // Ranking e histórico
-app.use("/", timeRoutes); // Times
-app.use("/", jogoRoutes); // Jogos sequenciais (sistema antigo)
-app.use("/", jogoPeladaRoutes); // Jogos de pelada (sistema novo simplificado)
+app.use("/partidas", partidaRoutes); // Partidas (inclui rotas com grupos e partidas)
+app.use("/ranking", rankingRoutes); // Ranking e histórico
+app.use("/times", timeRoutes); // Times
+app.use("/jogos", jogoRoutes); // Jogos sequenciais (sistema antigo)
+app.use("/jogos-pelada", jogoPeladaRoutes); // Jogos de pelada (sistema novo simplificado)
 
 // Middleware para rotas não encontradas
 app.use((req: Request, res: Response) => {

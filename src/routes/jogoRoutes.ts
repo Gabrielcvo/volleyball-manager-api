@@ -16,12 +16,12 @@ const router = Router();
 router.use(authenticateToken);
 
 // Rotas para jogos
-router.post("/partidas/:partidaId/jogos/inicializar", inicializarJogos); // POST /partidas/:partidaId/jogos/inicializar - Inicializar sistema de jogos
-router.get("/partidas/:partidaId/jogos", listarJogos); // GET /partidas/:partidaId/jogos - Listar jogos da partida
-router.post("/partidas/:partidaId/jogos", criarProximoJogo); // POST /partidas/:partidaId/jogos - Criar próximo jogo manualmente
-router.get("/jogos/:jogoId", obterJogo); // GET /jogos/:jogoId - Obter detalhes do jogo
-router.put("/jogos/:jogoId/iniciar", iniciarJogo); // PUT /jogos/:jogoId/iniciar - Iniciar jogo
-router.put("/jogos/:jogoId/atualizar-pontos", atualizarPontos); // PUT /jogos/:jogoId/atualizar-pontos - Atualizar pontos em tempo real
-router.put("/jogos/:jogoId/finalizar", finalizarJogo); // PUT /jogos/:jogoId/finalizar - Finalizar jogo e registrar resultado
+router.post("/partidas/:partidaId/jogos/inicializar", inicializarJogos); // POST /jogos/partidas/:partidaId/jogos/inicializar - Inicializar sistema de jogos
+router.get("/partidas/:partidaId/jogos", listarJogos); // GET /jogos/partidas/:partidaId/jogos - Listar jogos da partida
+router.post("/partidas/:partidaId/jogos", criarProximoJogo); // POST /jogos/partidas/:partidaId/jogos - Criar próximo jogo manualmente
+router.get("/:jogoId", obterJogo); // GET /jogos/:jogoId - Obter detalhes do jogo
+router.put("/:jogoId/iniciar", iniciarJogo); // PUT /jogos/:jogoId/iniciar - Iniciar jogo
+router.put("/:jogoId/atualizar-pontos", atualizarPontos); // PUT /jogos/:jogoId/atualizar-pontos - Atualizar pontos em tempo real
+router.put("/:jogoId/finalizar", finalizarJogo); // PUT /jogos/:jogoId/finalizar - Finalizar jogo e registrar resultado
 
 export default router;
