@@ -21,24 +21,37 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(express.json());
 
-// Configuração CORS mais permissiva para dispositivos móveis
+// Middleware CORS global - DEVE vir ANTES de todas as rotas
 app.use((req, res, next) => {
-  // Headers CORS essenciais
+  // Log para debug
+  console.log(
+    `[CORS] ${req.method} ${req.path} - Origin: ${req.headers.origin}`
+  );
+
+  // Permitir qualquer origem
   res.header("Access-Control-Allow-Origin", "*");
+
+  // Permitir todos os métodos
   res.header(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS, PATCH"
   );
+
+  // Permitir todos os headers
   res.header("Access-Control-Allow-Headers", "*");
-  res.header("Access-Control-Expose-Headers", "*");
+
+  // Headers adicionais para iOS
+  res.header("Access-Control-Allow-Credentials", "false");
   res.header("Access-Control-Max-Age", "86400");
 
-  // Headers específicos para iOS
-  res.header("Access-Control-Allow-Credentials", "false");
-  res.header("Referrer-Policy", "no-referrer-when-downgrade");
+  // Headers de segurança permissivos para desenvolvimento
+  res.header("Cross-Origin-Embedder-Policy", "unsafe-none");
+  res.header("Cross-Origin-Opener-Policy", "unsafe-none");
+  res.header("Cross-Origin-Resource-Policy", "cross-origin");
 
-  // Tratar preflight requests
+  // Tratar preflight OPTIONS
   if (req.method === "OPTIONS") {
+    console.log(`[CORS] Preflight OPTIONS para ${req.path} - Respondendo 200`);
     res.status(200).end();
     return;
   }
@@ -46,10 +59,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware CORS adicional como backup
+// Middleware CORS como backup usando a biblioteca cors
 app.use(
   cors({
-    origin: true,
+    origin: "*",
     credentials: false,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: "*",
@@ -58,18 +71,19 @@ app.use(
   })
 );
 
-// Middleware para forçar headers de segurança mais permissivos
+// Middleware adicional para garantir CORS em todas as respostas
 app.use((req, res, next) => {
-  // Forçar headers de segurança mais permissivos para desenvolvimento
-  res.header("X-Content-Type-Options", "nosniff");
-  res.header("X-Frame-Options", "SAMEORIGIN");
-  res.header("X-XSS-Protection", "1; mode=block");
-
-  // Headers específicos para resolver problemas de CORS em iOS
-  res.header("Cross-Origin-Embedder-Policy", "unsafe-none");
-  res.header("Cross-Origin-Opener-Policy", "unsafe-none");
-  res.header("Cross-Origin-Resource-Policy", "cross-origin");
-
+  // Garantir que os headers CORS sejam sempre aplicados
+  res.on("finish", () => {
+    if (!res.getHeader("Access-Control-Allow-Origin")) {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+      );
+      res.header("Access-Control-Allow-Headers", "*");
+    }
+  });
   next();
 });
 
@@ -79,6 +93,28 @@ app.get("/", (req: Request, res: Response) => {
     message: "Volleyball Manager API",
     version: "1.0.0",
   });
+});
+
+// Middleware CORS específico para rotas de autenticação
+app.use("/auth", (req, res, next) => {
+  console.log(`[AUTH CORS] ${req.method} ${req.path}`);
+
+  // Headers CORS específicos para autenticação
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+  );
+  res.header("Access-Control-Allow-Headers", "*");
+  res.header("Access-Control-Allow-Credentials", "false");
+
+  if (req.method === "OPTIONS") {
+    console.log(`[AUTH CORS] Preflight OPTIONS - Respondendo 200`);
+    res.status(200).end();
+    return;
+  }
+
+  next();
 });
 
 // Rotas da aplicação
