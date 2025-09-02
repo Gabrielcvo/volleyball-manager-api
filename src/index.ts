@@ -21,8 +21,8 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(
   cors({
-    origin: true, // Permite qualquer origem em desenvolvimento/produção
-    credentials: true,
+    origin: "*", // Permite qualquer origem (mais permissivo para Vercel)
+    credentials: false, // Desabilita credentials para compatibilidade móvel
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: [
       "Origin",
@@ -34,8 +34,43 @@ app.use(
     ],
     preflightContinue: false,
     optionsSuccessStatus: 200,
+    maxAge: 86400, // Cache preflight por 24 horas
   })
 );
+
+// Middleware CORS específico para Vercel
+app.use((req, res, next) => {
+  // Log para debug
+  console.log(
+    `[VERCEL CORS] ${req.method} ${req.path} - Origin: ${req.headers.origin}`
+  );
+
+  // Headers CORS essenciais
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+  );
+  res.header("Access-Control-Allow-Headers", "*");
+  res.header("Access-Control-Allow-Credentials", "false");
+  res.header("Access-Control-Max-Age", "86400");
+
+  // Headers específicos para iOS e Vercel
+  res.header("Cross-Origin-Embedder-Policy", "unsafe-none");
+  res.header("Cross-Origin-Opener-Policy", "unsafe-none");
+  res.header("Cross-Origin-Resource-Policy", "cross-origin");
+
+  // Tratar preflight OPTIONS
+  if (req.method === "OPTIONS") {
+    console.log(
+      `[VERCEL CORS] Preflight OPTIONS para ${req.path} - Respondendo 200`
+    );
+    res.status(200).end();
+    return;
+  }
+
+  next();
+});
 
 app.use(express.json());
 
