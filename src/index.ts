@@ -21,47 +21,56 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(express.json());
 
-// Configuração CORS para compatibilidade
-app.use(
-  cors({
-    origin: "*", // Permite qualquer origem
-    credentials: false, // Desabilita credentials para compatibilidade móvel
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: [
-      "Origin",
-      "X-Requested-With",
-      "Content-Type",
-      "Accept",
-      "Authorization",
-      // "Access-Control-Allow-Credentials",
-      "Access-Control-Allow-Origin",
-      "Access-Control-Allow-Methods",
-      "Access-Control-Allow-Headers",
-    ],
-    preflightContinue: false,
-    optionsSuccessStatus: 200,
-    maxAge: 86400, // Cache preflight por 24 horas
-  })
-);
-
-// Headers CORS adicionais para garantir compatibilidade
+// Configuração CORS mais permissiva para dispositivos móveis
 app.use((req, res, next) => {
+  // Headers CORS essenciais
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, OPTIONS, PATCH"
   );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
+  res.header("Access-Control-Allow-Headers", "*");
+  res.header("Access-Control-Expose-Headers", "*");
   res.header("Access-Control-Max-Age", "86400");
 
+  // Headers específicos para iOS
+  res.header("Access-Control-Allow-Credentials", "false");
+  res.header("Referrer-Policy", "no-referrer-when-downgrade");
+
+  // Tratar preflight requests
   if (req.method === "OPTIONS") {
-    res.sendStatus(200);
-  } else {
-    next();
+    res.status(200).end();
+    return;
   }
+
+  next();
+});
+
+// Middleware CORS adicional como backup
+app.use(
+  cors({
+    origin: true,
+    credentials: false,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: "*",
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
+  })
+);
+
+// Middleware para forçar headers de segurança mais permissivos
+app.use((req, res, next) => {
+  // Forçar headers de segurança mais permissivos para desenvolvimento
+  res.header("X-Content-Type-Options", "nosniff");
+  res.header("X-Frame-Options", "SAMEORIGIN");
+  res.header("X-XSS-Protection", "1; mode=block");
+
+  // Headers específicos para resolver problemas de CORS em iOS
+  res.header("Cross-Origin-Embedder-Policy", "unsafe-none");
+  res.header("Cross-Origin-Opener-Policy", "unsafe-none");
+  res.header("Cross-Origin-Resource-Policy", "cross-origin");
+
+  next();
 });
 
 app.get("/", (req: Request, res: Response) => {
