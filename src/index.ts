@@ -18,74 +18,31 @@ import jogoPeladaRoutes from "./routes/jogoPeladaRoutes";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = [
+  "https://volleyball-manager-api-git-feat-cors-gabrielcvos-projects.vercel.app/",
+];
 // Middlewares
-app.use(express.json());
+const corsOptions = {
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
 
-// Middleware CORS global - DEVE vir ANTES de todas as rotas
-app.use((req, res, next) => {
-  // Log para debug
-  console.log(
-    `[CORS] ${req.method} ${req.path} - Origin: ${req.headers.origin}`
-  );
-
-  // Permitir qualquer origem
-  res.header("Access-Control-Allow-Origin", "*");
-
-  // Permitir todos os métodos
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-  );
-
-  // Permitir todos os headers
-  res.header("Access-Control-Allow-Headers", "*");
-
-  // Headers adicionais para iOS
-  res.header("Access-Control-Allow-Credentials", "false");
-  res.header("Access-Control-Max-Age", "86400");
-
-  // Headers de segurança permissivos para desenvolvimento
-  res.header("Cross-Origin-Embedder-Policy", "unsafe-none");
-  res.header("Cross-Origin-Opener-Policy", "unsafe-none");
-  res.header("Cross-Origin-Resource-Policy", "cross-origin");
-
-  // Tratar preflight OPTIONS
-  if (req.method === "OPTIONS") {
-    console.log(`[CORS] Preflight OPTIONS para ${req.path} - Respondendo 200`);
-    res.status(200).end();
-    return;
-  }
-
-  next();
-});
-
-// Middleware CORS como backup usando a biblioteca cors
-app.use(
-  cors({
-    origin: "*",
-    credentials: false,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allowedHeaders: "*",
-    preflightContinue: false,
-    optionsSuccessStatus: 200,
-  })
-);
-
-// Middleware adicional para garantir CORS em todas as respostas
-app.use((req, res, next) => {
-  // Garantir que os headers CORS sejam sempre aplicados
-  res.on("finish", () => {
-    if (!res.getHeader("Access-Control-Allow-Origin")) {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-      );
-      res.header("Access-Control-Allow-Headers", "*");
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
     }
-  });
-  next();
-});
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
@@ -93,28 +50,6 @@ app.get("/", (req: Request, res: Response) => {
     message: "Volleyball Manager API",
     version: "1.0.0",
   });
-});
-
-// Middleware CORS específico para rotas de autenticação
-app.use("/auth", (req, res, next) => {
-  console.log(`[AUTH CORS] ${req.method} ${req.path}`);
-
-  // Headers CORS específicos para autenticação
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-  );
-  res.header("Access-Control-Allow-Headers", "*");
-  res.header("Access-Control-Allow-Credentials", "false");
-
-  if (req.method === "OPTIONS") {
-    console.log(`[AUTH CORS] Preflight OPTIONS - Respondendo 200`);
-    res.status(200).end();
-    return;
-  }
-
-  next();
 });
 
 // Rotas da aplicação
