@@ -14,6 +14,7 @@ import rankingRoutes from "./routes/rankingRoutes";
 import timeRoutes from "./routes/timeRoutes";
 import jogoRoutes from "./routes/jogoRoutes";
 import jogoPeladaRoutes from "./routes/jogoPeladaRoutes";
+import healthRoutes from "./routes/healthRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -46,6 +47,9 @@ app.get("/", (req: Request, res: Response) => {
     version: "1.0.0",
   });
 });
+
+// Rotas de health check (sem autenticação)
+app.use("/health", healthRoutes); // Health check e teste de banco
 
 // Rotas da aplicação
 app.use("/auth", authRoutes); // Autenticação
