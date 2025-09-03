@@ -38,7 +38,7 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
-
+app.options("*", cors());
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     status: "API rodando com sucesso!",
