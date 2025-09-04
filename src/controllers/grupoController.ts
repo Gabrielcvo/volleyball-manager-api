@@ -1,8 +1,6 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../config/database";
 import { AuthenticatedRequest } from "../types/auth";
-
-const prisma = new PrismaClient();
 
 // Criar novo grupo
 export const criarGrupo = async (req: AuthenticatedRequest, res: Response) => {

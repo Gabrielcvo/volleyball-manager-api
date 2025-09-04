@@ -1,8 +1,6 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../config/database";
 import { AuthenticatedRequest } from "../types/auth";
-
-const prisma = new PrismaClient();
 
 /**
  * MODELO SIMPLIFICADO PARA PELADAS DE VÔLEI
@@ -907,4 +905,3 @@ export const obterJogo = async (req: AuthenticatedRequest, res: Response) => {
     return res.status(500).json({ error: "Erro interno do servidor." });
   }
 };
-
