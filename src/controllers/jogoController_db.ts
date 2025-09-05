@@ -1,8 +1,6 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../config/database";
 import { AuthenticatedRequest } from "../types/auth";
-
-const prisma = new PrismaClient();
 
 interface TimeBasic {
   id: number;

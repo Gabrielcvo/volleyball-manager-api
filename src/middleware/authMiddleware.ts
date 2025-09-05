@@ -1,9 +1,7 @@
 import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../config/database";
 import { AuthenticatedRequest } from "../types/auth";
-
-const prisma = new PrismaClient();
 
 // Middleware para autenticar token JWT
 export const authenticateToken = async (
